@@ -10,6 +10,7 @@ class EventAddress
         public readonly string $locality,
         public readonly string $postalCode,
         public readonly string $country,
+        public readonly string $countryCode,
         public readonly string $lat,
         public readonly string $lng
     ) {}
@@ -23,8 +24,8 @@ class EventAddress
             postalCode: $location['address']['postalCode'],
             country: $location['address']['addressCountry']['name'],
             lat: $location['geo']['latitude'],
-            lng: $location['geo']['longitude']
-
+            lng: $location['geo']['longitude'],
+            countryCode: $location['address']['addressCountry']['identifier']
         );
     }
 }

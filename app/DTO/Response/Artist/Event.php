@@ -10,6 +10,7 @@ class Event
         public readonly string $type,
         public readonly string $startDate,
         public readonly string $endDate,
+        public readonly string $status,
         public readonly EventAddress $address
     ) {}
 
@@ -23,6 +24,7 @@ class Event
             type: $event['@type'],
             startDate: $event['startDate'],
             endDate: $event['endDate'],
+            status: $event['eventStatus'],
             address: $address
         );
     }
