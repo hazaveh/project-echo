@@ -20,6 +20,10 @@ class FetchArtistAction
 
         $response = Http::jambase()->get(sprintf(self::ENDPOINT, $source, $artistId), $payload);
 
+        if ($response->failed()) {
+            return response($response->body(), $response->status());
+        }
+
         return SearchArtistDTO::fromResponse($this->validate($response->json()));
     }
 
