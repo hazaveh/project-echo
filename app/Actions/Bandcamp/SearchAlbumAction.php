@@ -22,12 +22,16 @@ class SearchAlbumAction
             $album = $node->filter('.result-info');
             $res = [
                 "name" => $album->filter('.heading a')->text(),
-                "artist" => $album->filter('.subhead')->text(),
+                "artist" => $this->normalizeArtistName($album->filter('.subhead')->text()),
                 "url" => $album->filter('.itemurl')->text(),
             ];
             $results[] = $res;
         });
 
         return $results;
+    }
+
+    private function normalizeArtistName(string $name): string {
+        return str_replace('by ', '', $name);
     }
 }
