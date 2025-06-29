@@ -12,7 +12,9 @@
         "php": "^8.2",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "symfony/css-selector": "^7.3",
+        "symfony/dom-crawler": "^7.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -22,7 +24,7 @@
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^11.0.1"
+        "pestphp/pest": "^3.8"
     },
     "autoload": {
         "psr-4": {
@@ -37,6 +39,7 @@
         }
     },
     "scripts": {
+        "test": "vendor/bin/pest",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
