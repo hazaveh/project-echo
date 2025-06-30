@@ -18,15 +18,20 @@ class SearchAlbumAction
 
         $results = [];
 
-        $crawler->filter('.result-items')->children()->each(function(Crawler $node) use (&$results) {
-            $album = $node->filter('.result-info');
-            $res = [
-                "name" => $album->filter('.heading a')->text(),
-                "artist" => $this->normalizeArtistName($album->filter('.subhead')->text()),
-                "url" => $album->filter('.itemurl')->text(),
-            ];
-            $results[] = $res;
-        });
+        $nodes = $crawler->filter('.result-items');
+
+
+        if ($nodes->count()) {
+            $nodes->children()->each(function(Crawler $node) use (&$results) {
+                $album = $node->filter('.result-info');
+                $res = [
+                    "name" => $album->filter('.heading a')->text(),
+                    "artist" => $this->normalizeArtistName($album->filter('.subhead')->text()),
+                    "url" => $album->filter('.itemurl')->text(),
+                ];
+                $results[] = $res;
+            });
+        }
 
         return $results;
     }
