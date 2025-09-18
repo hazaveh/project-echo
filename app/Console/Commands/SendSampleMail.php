@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Mail\SampleTestMail;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
