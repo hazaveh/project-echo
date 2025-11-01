@@ -37,6 +37,8 @@ class RedditNewPostsGrabberCommand extends Command
             return Command::FAILURE;
         }
 
+
+
         foreach ($response->json('data.children') as $post) {
             $this->info("Saving Post: {$post['data']['id']}");
 
