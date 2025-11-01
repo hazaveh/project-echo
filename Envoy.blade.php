@@ -1,4 +1,4 @@
-@servers(['acid25' => ['psilocin.empinet.com']])
+@servers(['psilocin' => ['psilocin.empinet.com']])
 
 @task('deploy')
     cd /srv/stacks/project-echo
