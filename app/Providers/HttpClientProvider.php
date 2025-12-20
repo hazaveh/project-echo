@@ -40,4 +40,14 @@ class HttpClientProvider extends ServiceProvider
             ])->withToken((new GetAccessToken())->execute())->asForm();
         });
     }
+
+    private function ticketmaster(): void
+    {
+        Http::macro('ticketmaster', function () {
+            return Http::baseUrl(config('services.ticketmaster.base_url'))->withHeaders([
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . config('services.ticketmaster.key'),
+            ]);
+        });
+    }
 }
