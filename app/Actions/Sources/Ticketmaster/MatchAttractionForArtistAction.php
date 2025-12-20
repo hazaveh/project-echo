@@ -11,6 +11,12 @@ class MatchAttractionForArtistAction
 {
     public function execute(Artist $artist): ?TicketProviderMapping
     {
+        $tokens = $this->artistTokens($artist);
+
+        if ($tokens === []) {
+            return null;
+        }
+
         $response = Http::baseUrl(config('services.ticketmaster.base_url'))
             ->get('attractions', [
                 'apikey' => config('services.ticketmaster.key'),
@@ -24,9 +30,8 @@ class MatchAttractionForArtistAction
         }
 
         $attractions = data_get($response->json(), '_embedded.attractions', []);
-        $tokens = $this->artistTokens($artist);
 
-        if ($tokens === [] || $attractions === []) {
+        if ($attractions === []) {
             return null;
         }
 
