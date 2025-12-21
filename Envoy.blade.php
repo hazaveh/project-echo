@@ -1,6 +1,7 @@
 @servers(['psilocin' => ['psilocin.empinet.com']])
 
 @task('deploy')
+    setfacl -R -m u:33:rwx /srv/stacks/project-echo
     cd /srv/stacks/project-echo
     git stash
     git pull origin master
