@@ -18,5 +18,5 @@ Route::group(['middleware' => AuthorizeTokenMiddleware::class], function () {
 
     Route::post('artists/upsert', \App\Http\Controllers\UpsertArtistController::class);
 
-    Route::get('artists/concerts/{provider}/{prnId}', SearchConcertController::class);
+    Route::get('artists/{prnArtistId}/concerts', SearchConcertController::class);
 });

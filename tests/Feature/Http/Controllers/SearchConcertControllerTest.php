@@ -1,14 +1,111 @@
 <?php
 
 use App\Models\Artist;
+use App\Models\ConcertProviderSyncLog;
 use App\Models\TicketProviderMapping;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
+it('returns json 404 when the artist does not exist', function () {
+    $response = $this->getJson('/api/artists/999/concerts');
+
+    $response->assertNotFound()
+        ->assertJsonPath('ok', false)
+        ->assertJsonPath('error', 'artist_not_found')
+        ->assertJsonPath('message', 'Artist not found.');
+});
+
+it('returns empty performances when no provider mappings exist', function () {
+    $artist = Artist::factory()->create([
+        'prn_artist_id' => 456,
+        'name' => 'MONO',
+    ]);
+
+    $response = $this->getJson('/api/artists/'.$artist->prn_artist_id.'/concerts');
+
+    $response->assertSuccessful()
+        ->assertJsonPath('ok', true)
+        ->assertJsonPath('prn_artist_id', 456)
+        ->assertJsonCount(0, 'performances');
+});
+
 it('returns ticketmaster concerts for an artist', function () {
+    $stub = file_get_contents(base_path('tests/Stubs/Ticketmaster/events-search-mono'));
+
+    config([
+        'services.ticketmaster.base_url' => 'https://app.ticketmaster.com/discovery/v2',
+        'services.ticketmaster.key' => 'test-key',
+    ]);
+
+    $callCount = 0;
+
+    Http::fake(function () use (&$callCount, $stub) {
+        $callCount++;
+
+        return $callCount === 1
+            ? Http::response($stub, 200)
+            : Http::response(['error' => 'bad'], 500);
+    });
+
+    $artist = Artist::factory()->create([
+        'prn_artist_id' => 123,
+        'name' => 'MONO',
+    ]);
+
+    TicketProviderMapping::create([
+        'artist_id' => $artist->id,
+        'provider' => 'ticketmaster',
+        'provider_artist_id' => 'K8vZ9175Tr0',
+        'status' => 'active',
+    ]);
+
+    $response = $this->getJson('/api/artists/123/concerts');
+
+    $response->assertSuccessful()
+        ->assertJsonPath('ok', true)
+        ->assertJsonPath('prn_artist_id', 123)
+        ->assertJsonCount(2, 'performances')
+        ->assertJsonPath('performances.0.address_name', 'Columbia Theater')
+        ->assertJsonPath('performances.0.latitude', 52.4937)
+        ->assertJsonPath('performances.0.offers.0.provider', 'ticketmaster')
+        ->assertJsonPath('performances.0.offers.0.provider_name', 'Ticketmaster')
+        ->assertJsonPath('performances.1.offers.0.url', null)
+        ->assertJsonPath('performances.0.identifier', concertIdentifier(123, '2026-03-12', 'DE', 'Berlin', 'Columbia Theater'))
+        ->assertJsonPath('performances.1.identifier', concertIdentifier(123, '2026-03-14', 'DE', 'Cologne', 'Live Music Hall'));
+});
+
+it('returns json even when the provider fails', function () {
+    config([
+        'services.ticketmaster.base_url' => 'https://app.ticketmaster.com/discovery/v2',
+        'services.ticketmaster.key' => 'test-key',
+    ]);
+
+    Http::fake([
+        'https://app.ticketmaster.com/discovery/v2/events*' => Http::response(['error' => 'bad'], 500),
+    ]);
+
+    $artist = Artist::factory()->create([
+        'prn_artist_id' => 321,
+        'name' => 'MONO',
+    ]);
+
+    TicketProviderMapping::create([
+        'artist_id' => $artist->id,
+        'provider' => 'ticketmaster',
+        'provider_artist_id' => 'K8vZ9175Tr0',
+        'status' => 'active',
+    ]);
+
+    $response = $this->getJson('/api/artists/321/concerts');
+
+    $response->assertSuccessful()
+        ->assertJsonPath('ok', true)
+        ->assertJsonCount(0, 'performances');
+});
+
+it('writes sync logs for successful provider responses', function () {
     $stub = file_get_contents(base_path('tests/Stubs/Ticketmaster/events-search-mono'));
 
     config([
@@ -21,7 +118,7 @@ it('returns ticketmaster concerts for an artist', function () {
     ]);
 
     $artist = Artist::factory()->create([
-        'prn_artist_id' => 123,
+        'prn_artist_id' => 555,
         'name' => 'MONO',
     ]);
 
@@ -30,50 +127,62 @@ it('returns ticketmaster concerts for an artist', function () {
         'provider' => 'ticketmaster',
         'provider_artist_id' => 'K8vZ9175Tr0',
         'status' => 'active',
-        'last_synced_at' => Carbon::parse('2025-12-20T16:25:00Z')->utc(),
     ]);
 
-    $response = $this->getJson('/api/artists/concerts/ticketmaster/123');
+    $this->getJson('/api/artists/555/concerts')->assertSuccessful();
 
-    $response->assertSuccessful()
-        ->assertJsonPath('ok', true)
-        ->assertJsonPath('provider', 'ticketmaster')
-        ->assertJsonPath('prn_artist_id', 123)
-        ->assertJsonPath('provider_artist_id', 'K8vZ9175Tr0')
-        ->assertJsonPath('synced_at', '2025-12-20T16:25:00Z')
-        ->assertJsonCount(2, 'performances')
-        ->assertJsonPath('performances.0.identifier', 'echo:tm:Z7r9jZ1A7a1oF')
-        ->assertJsonPath('performances.0.address_name', 'Columbia Theater')
-        ->assertJsonPath('performances.0.latitude', 52.4937)
-        ->assertJsonPath('performances.1.identifier', 'echo:tm:G5vYZ9l2k3mPq')
-        ->assertJsonPath('performances.1.ticket_url', null);
+    $successLog = ConcertProviderSyncLog::query()->first();
+
+    expect($successLog)->not->toBeNull()
+        ->and($successLog->ok)->toBeTrue()
+        ->and($successLog->status_code)->toBe(200)
+        ->and($successLog->provider)->toBe('ticketmaster')
+        ->and($successLog->result_count)->toBe(2);
 });
 
-it('returns not found when the artist does not exist', function () {
-    $response = $this->getJson('/api/artists/concerts/ticketmaster/999');
+it('writes sync logs for provider errors', function () {
+    config([
+        'services.ticketmaster.base_url' => 'https://app.ticketmaster.com/discovery/v2',
+        'services.ticketmaster.key' => 'test-key',
+    ]);
 
-    $response->assertNotFound()
-        ->assertJsonPath('ok', false)
-        ->assertJsonPath('message', 'Artist not found.');
-});
+    Http::fake([
+        'https://app.ticketmaster.com/discovery/v2/events*' => Http::response(['error' => 'bad'], 500),
+    ]);
 
-it('returns not found when the ticketmaster mapping is missing', function () {
-    Artist::factory()->create([
-        'prn_artist_id' => 456,
+    $artist = Artist::factory()->create([
+        'prn_artist_id' => 777,
         'name' => 'MONO',
     ]);
 
-    $response = $this->getJson('/api/artists/concerts/ticketmaster/456');
+    TicketProviderMapping::create([
+        'artist_id' => $artist->id,
+        'provider' => 'ticketmaster',
+        'provider_artist_id' => 'K8vZ9175Tr0',
+        'status' => 'active',
+    ]);
 
-    $response->assertNotFound()
-        ->assertJsonPath('ok', false)
-        ->assertJsonPath('message', 'Ticketmaster mapping not found.');
+    $this->getJson('/api/artists/777/concerts')->assertSuccessful();
+
+    $errorLog = ConcertProviderSyncLog::query()->first();
+
+    expect($errorLog)->not->toBeNull()
+        ->and($errorLog->ok)->toBeFalse()
+        ->and($errorLog->status_code)->toBe(500);
 });
 
-it('returns unprocessable when the provider is unsupported', function () {
-    $response = $this->getJson('/api/artists/concerts/eventbrite/123');
+function concertIdentifier(int $prnArtistId, string $startDate, string $countryCode, string $city, string $venue): string
+{
+    $normalizedCity = concertNormalizeValue($city);
+    $normalizedVenue = concertNormalizeValue($venue);
 
-    $response->assertUnprocessable()
-        ->assertJsonPath('ok', false)
-        ->assertJsonPath('message', 'Provider not supported.');
-});
+    return 'echo:perf:'.sha1($prnArtistId.$startDate.$countryCode.$normalizedCity.$normalizedVenue);
+}
+
+function concertNormalizeValue(string $value): string
+{
+    $normalized = strtolower(trim($value));
+    $normalized = preg_replace('/\s+/', ' ', $normalized);
+
+    return $normalized ?? '';
+}

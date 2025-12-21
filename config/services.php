@@ -50,6 +50,7 @@ return [
     'ticketmaster' => [
         'base_url' => env('TICKETMASTER_URL', 'https://app.ticketmaster.com/discovery/v2'),
         'key' => env('TICKETMASTER_KEY'),
+        'affiliate_url' => env('TICKETMASTER_AFFILIATE_URL'),
     ],
 
 ];
