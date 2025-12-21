@@ -5,6 +5,7 @@ use App\Models\ConcertProviderSyncLog;
 use App\Models\TicketProviderMapping;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 uses(RefreshDatabase::class);
 
@@ -74,17 +75,33 @@ it('returns ticketmaster concerts for an artist', function () {
         ->assertJsonPath('performances.1.offers.0.url', null)
         ->assertJsonPath('performances.0.identifier', concertIdentifier(123, '2026-03-12', 'DE', 'Berlin', 'Columbia Theater'))
         ->assertJsonPath('performances.1.identifier', concertIdentifier(123, '2026-03-14', 'DE', 'Cologne', 'Live Music Hall'));
+
+    $cachedResponse = $this->getJson('/api/artists/123/concerts');
+
+    $cachedResponse->assertSuccessful()
+        ->assertJsonPath('ok', true)
+        ->assertJsonCount(2, 'performances');
+
+    expect($callCount)->toBe(1);
 });
 
 it('returns json even when the provider fails', function () {
+    $stub = file_get_contents(base_path('tests/Stubs/Ticketmaster/events-search-mono'));
+
     config([
         'services.ticketmaster.base_url' => 'https://app.ticketmaster.com/discovery/v2',
         'services.ticketmaster.key' => 'test-key',
     ]);
 
-    Http::fake([
-        'https://app.ticketmaster.com/discovery/v2/events*' => Http::response(['error' => 'bad'], 500),
-    ]);
+    $callCount = 0;
+
+    Http::fake(function () use (&$callCount, $stub) {
+        $callCount++;
+
+        return $callCount === 1
+            ? Http::response(['error' => 'bad'], 500)
+            : Http::response($stub, 200);
+    });
 
     $artist = Artist::factory()->create([
         'prn_artist_id' => 321,
@@ -98,11 +115,29 @@ it('returns json even when the provider fails', function () {
         'status' => 'active',
     ]);
 
+    Log::shouldReceive('error')
+        ->once()
+        ->withArgs(function (string $message, array $context) use ($artist) {
+            return $message === 'Ticketmaster request failed.'
+                && ($context['prn_artist_id'] ?? null) === $artist->prn_artist_id
+                && ($context['artist_id'] ?? null) === $artist->id
+                && ($context['provider_artist_id'] ?? null) === 'K8vZ9175Tr0'
+                && ($context['status'] ?? null) === 500;
+        });
+
     $response = $this->getJson('/api/artists/321/concerts');
 
     $response->assertSuccessful()
         ->assertJsonPath('ok', true)
         ->assertJsonCount(0, 'performances');
+
+    $secondResponse = $this->getJson('/api/artists/321/concerts');
+
+    $secondResponse->assertSuccessful()
+        ->assertJsonPath('ok', true)
+        ->assertJsonCount(2, 'performances');
+
+    expect($callCount)->toBe(2);
 });
 
 it('writes sync logs for successful provider responses', function () {

@@ -6,6 +6,8 @@ use App\DTO\ConcertProviders\ProviderResult;
 use App\Models\Artist;
 use App\Models\TicketProviderMapping;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class TicketmasterConcertProvider implements ConcertProviderInterface
 {
@@ -26,20 +28,45 @@ class TicketmasterConcertProvider implements ConcertProviderInterface
 
     public function fetchConcerts(Artist $artist, TicketProviderMapping $mapping): ProviderResult
     {
-        $response = Http::baseUrl(config('services.ticketmaster.base_url'))
-            ->get('events', [
-                'apikey' => config('services.ticketmaster.key'),
-                'attractionId' => $mapping->provider_artist_id,
-                'classificationName' => 'music',
-                'sort' => 'date,asc',
-                'size' => 100,
-                'locale' => '*',
+        try {
+            $response = Http::baseUrl(config('services.ticketmaster.base_url'))
+                ->get('events', [
+                    'apikey' => config('services.ticketmaster.key'),
+                    'attractionId' => $mapping->provider_artist_id,
+                    'classificationName' => 'music',
+                    'sort' => 'date,asc',
+                    'size' => 100,
+                    'locale' => '*',
+                ]);
+        } catch (Throwable $exception) {
+            Log::error('Ticketmaster request threw an exception.', [
+                'prn_artist_id' => $artist->prn_artist_id,
+                'artist_id' => $artist->id,
+                'provider_artist_id' => $mapping->provider_artist_id,
+                'message' => $exception->getMessage(),
             ]);
+
+            return new ProviderResult(
+                ok: false,
+                statusCode: null,
+                payload: null,
+                errorMessage: $exception->getMessage(),
+                performances: []
+            );
+        }
 
         $payload = $response->json();
         $payload = is_array($payload) ? $payload : null;
 
         if ($response->failed()) {
+            Log::error('Ticketmaster request failed.', [
+                'prn_artist_id' => $artist->prn_artist_id,
+                'artist_id' => $artist->id,
+                'provider_artist_id' => $mapping->provider_artist_id,
+                'status' => $response->status(),
+                'payload' => $payload,
+            ]);
+
             return new ProviderResult(
                 ok: false,
                 statusCode: $response->status(),
