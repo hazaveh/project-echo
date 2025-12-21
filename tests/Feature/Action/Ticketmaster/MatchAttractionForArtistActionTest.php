@@ -25,11 +25,12 @@ it('stores a ticketmaster mapping when external links match', function () {
         'instagram' => 'monoofjapan',
     ]);
 
-    $mapping = (new MatchAttractionForArtistAction)->execute($artist);
+    $result = (new MatchAttractionForArtistAction)->execute($artist);
 
-    expect($mapping)->not->toBeNull()
-        ->and($mapping->provider)->toBe('ticketmaster')
-        ->and($mapping->provider_artist_id)->toBe('K8vZ9179Mb7');
+    expect($result->ok)->toBeTrue()
+        ->and($result->mapping)->not->toBeNull()
+        ->and($result->mapping->provider)->toBe('ticketmaster')
+        ->and($result->mapping->provider_artist_id)->toBe('K8vZ9179Mb7');
 
     $this->assertDatabaseHas('ticket_provider_mappings', [
         'artist_id' => $artist->id,
@@ -56,7 +57,8 @@ it('returns null when no external links match', function () {
         'instagram' => 'not-a-match',
     ]);
 
-    $mapping = (new MatchAttractionForArtistAction)->execute($artist);
+    $result = (new MatchAttractionForArtistAction)->execute($artist);
 
-    expect($mapping)->toBeNull();
+    expect($result->ok)->toBeTrue()
+        ->and($result->mapping)->toBeNull();
 });

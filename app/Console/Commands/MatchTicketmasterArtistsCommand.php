@@ -13,7 +13,7 @@ class MatchTicketmasterArtistsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'ticketmaster:match-artists {--sleep=100000}';
+    protected $signature = 'ticketmaster:match-artists {--sleep=100000} {--cooldown-days=1} {--refresh-days=30}';
 
     /**
      * The console command description.
@@ -33,21 +33,44 @@ class MatchTicketmasterArtistsCommand extends Command
             return self::FAILURE;
         }
 
+        $provider = 'ticketmaster';
         $sleepMicroseconds = max(0, (int) $this->option('sleep'));
+        $cooldownDays = max(0, (int) $this->option('cooldown-days'));
+        $refreshDays = max(0, (int) $this->option('refresh-days'));
+        $now = now();
+        $refreshCutoff = $now->copy()->subDays($refreshDays);
         $processed = 0;
         $matched = 0;
         $missed = 0;
 
         $query = Artist::query()
-            ->whereDoesntHave('ticketProviderMappings', function ($query) {
-                $query->where('provider', 'ticketmaster');
-            })
-            ->orderBy('id');
+            ->where(function ($query) use ($provider, $refreshCutoff) {
+                $query->whereDoesntHave('ticketProviderMappings', function ($query) use ($provider) {
+                    $query->where('provider', $provider);
+                })->orWhereHas('ticketProviderMappings', function ($query) use ($provider, $refreshCutoff) {
+                    $query->where('provider', $provider)
+                        ->where(function ($query) use ($refreshCutoff) {
+                            $query->whereNull('last_synced_at')
+                                ->orWhere('last_synced_at', '<=', $refreshCutoff);
+                        });
+                });
+            });
+
+        if ($cooldownDays > 0) {
+            $cooldownCutoff = $now->copy()->subDays($cooldownDays);
+
+            $query->where(function ($query) use ($cooldownCutoff) {
+                $query->whereNull('ticketmaster_match_attempted_at')
+                    ->orWhere('ticketmaster_match_attempted_at', '<', $cooldownCutoff);
+            });
+        }
+
+        $query->orderBy('id');
 
         $total = (clone $query)->count();
 
         if ($total === 0) {
-            $this->info('No artists found without Ticketmaster mappings.');
+            $this->info('No artists eligible for Ticketmaster matching.');
 
             return self::SUCCESS;
         }
@@ -61,13 +84,19 @@ class MatchTicketmasterArtistsCommand extends Command
 
         $query->chunkById(100, function ($artists) use ($action, $sleepMicroseconds, &$processed, &$matched, &$missed, $progress, $command) {
             foreach ($artists as $artist) {
-                $mapping = $action->execute($artist);
+                $result = $action->execute($artist);
+
+                if ($result->ok) {
+                    $artist->forceFill([
+                        'ticketmaster_match_attempted_at' => now(),
+                    ])->save();
+                }
 
                 $processed++;
-                $mapping ? $matched++ : $missed++;
+                $result->mapping ? $matched++ : $missed++;
 
                 if ($command->output->isVerbose()) {
-                    $status = $mapping ? 'matched' : 'missed';
+                    $status = $result->mapping ? 'matched' : 'missed';
                     $command->line(" [{$status}] {$artist->id} {$artist->name}");
                 }
 

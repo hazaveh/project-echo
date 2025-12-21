@@ -47,4 +47,11 @@ class Artist extends Model
     {
         return self::query()->bySpotify($spotify)->first();
     }
+
+    protected function casts(): array
+    {
+        return [
+            'ticketmaster_match_attempted_at' => 'datetime',
+        ];
+    }
 }

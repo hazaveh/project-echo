@@ -2,6 +2,7 @@
 
 namespace App\Actions\Sources\Ticketmaster;
 
+use App\DTO\Ticketmaster\MatchAttractionResult;
 use App\Models\Artist;
 use App\Models\TicketProviderMapping;
 use Illuminate\Support\Facades\Http;
@@ -9,12 +10,12 @@ use Illuminate\Support\Str;
 
 class MatchAttractionForArtistAction
 {
-    public function execute(Artist $artist): ?TicketProviderMapping
+    public function execute(Artist $artist): MatchAttractionResult
     {
         $tokens = $this->artistTokens($artist);
 
         if ($tokens === []) {
-            return null;
+            return new MatchAttractionResult(false, null);
         }
 
         $response = Http::baseUrl(config('services.ticketmaster.base_url'))
@@ -26,19 +27,19 @@ class MatchAttractionForArtistAction
             ]);
 
         if ($response->failed()) {
-            return null;
+            return new MatchAttractionResult(false, null);
         }
 
         $attractions = data_get($response->json(), '_embedded.attractions', []);
 
         if ($attractions === []) {
-            return null;
+            return new MatchAttractionResult(true, null);
         }
 
         $match = $this->bestMatch($attractions, $tokens);
 
         if ($match === null) {
-            return null;
+            return new MatchAttractionResult(true, null);
         }
 
         $matchedTokens = $match['matched_tokens'];
@@ -46,7 +47,7 @@ class MatchAttractionForArtistAction
             ? 'spotify_verified'
             : 'name_match';
 
-        return TicketProviderMapping::updateOrCreate(
+        $mapping = TicketProviderMapping::updateOrCreate(
             [
                 'artist_id' => $artist->id,
                 'provider' => 'ticketmaster',
@@ -59,6 +60,8 @@ class MatchAttractionForArtistAction
                 'last_synced_at' => now(),
             ]
         );
+
+        return new MatchAttractionResult(true, $mapping);
     }
 
     /**
