@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->boolean('contacted')->default(false);
             $table->timestamps();
-            
+
             $table->index('username');
         });
     }

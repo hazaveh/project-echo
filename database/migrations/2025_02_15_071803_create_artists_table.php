@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::create('artists', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('spotify_id')->unique();
-            $table->dateTime('synced_at')->nullable();
+            $table->string('name', 255);
+            $table->unsignedBigInteger('prn_artist_id')->unique();
+            $table->string('spotify', 64)->nullable()->unique();
+            $table->string('instagram', 100)->nullable()->index();
+            $table->string('twitter', 100)->nullable()->index();
+            $table->string('facebook', 100)->nullable()->index();
+            $table->string('youtube', 128)->nullable()->index();
+            $table->string('homepage', 255)->nullable();
+            $table->string('apple_music', 128)->nullable()->index();
             $table->timestamps();
         });
     }

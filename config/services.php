@@ -45,6 +45,11 @@ return [
         'client_secret' => env('REDDIT_CLIENT_SECRET'),
         'username' => env('REDDIT_USERNAME'),
         'password' => env('REDDIT_PASSWORD'),
-    ]
+    ],
+
+    'ticketmaster' => [
+        'base_url' => env('TICKETMASTER_URL', 'https://app.ticketmaster.com/discovery/v2'),
+        'key' => env('TICKETMASTER_KEY'),
+    ],
 
 ];

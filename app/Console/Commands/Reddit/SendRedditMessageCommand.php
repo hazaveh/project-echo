@@ -27,7 +27,7 @@ class SendRedditMessageCommand extends Command
      */
     public function handle()
     {
-        foreach(RedditUser::where('contacted', false)->take(100)->get() as $user) {
+        foreach (RedditUser::where('contacted', false)->take(100)->get() as $user) {
             $response = Http::reddit()->post('https://oauth.reddit.com/api/compose', [
                 'api_type' => 'json',
                 'to' => $user->username,
@@ -41,7 +41,7 @@ class SendRedditMessageCommand extends Command
 
             $user->contacted = true;
             $user->save();
-            sleep(rand(1,15));
+            sleep(rand(1, 15));
             $this->info("sent message to {$user->username}");
         }
     }
