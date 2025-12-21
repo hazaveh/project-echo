@@ -33,11 +33,10 @@ class RedditNewPostsGrabberCommand extends Command
         $response = Http::reddit()->get($url);
 
         if ($response->failed()) {
-            $this->error('Error: ' . $response->status());
+            $this->error('Error: '.$response->status());
+
             return Command::FAILURE;
         }
-
-
 
         foreach ($response->json('data.children') as $post) {
             $this->info("Saving Post: {$post['data']['id']}");
@@ -52,6 +51,6 @@ class RedditNewPostsGrabberCommand extends Command
             ]);
         }
 
-        $this->info("Posts have been saved.");
+        $this->info('Posts have been saved.');
     }
 }

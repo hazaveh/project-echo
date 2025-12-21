@@ -33,11 +33,12 @@ class RedditUserGrabberCommand extends Command
 
             $response = Http::reddit()->get("https://oauth.reddit.com/r/postrock/comments/{$post->post_id}.json", ['limit' => 100]);
 
-            if (!is_array($response->json('1.data.children'))) {
+            if (! is_array($response->json('1.data.children'))) {
                 $this->error("Error: {$response->status()} Last Post: {$post->post_id}");
                 if ($response->status() == 429) {
-                    dd("Rate Limit");
+                    dd('Rate Limit');
                 }
+
                 continue;
             }
             foreach ($response->json('1.data.children') as $comment) {
@@ -49,7 +50,7 @@ class RedditUserGrabberCommand extends Command
                 }
             }
             $post->update(['is_processed' => '1']);
-            sleep(rand(1,8));
+            sleep(rand(1, 8));
         }
     }
 }

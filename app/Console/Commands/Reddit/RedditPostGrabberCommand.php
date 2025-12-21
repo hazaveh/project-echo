@@ -28,16 +28,15 @@ class RedditPostGrabberCommand extends Command
     public function handle()
     {
         $after = $this->argument('after') ?? true;
-        $url = "https://www.reddit.com/r/postrock/top.json";
+        $url = 'https://www.reddit.com/r/postrock/top.json';
 
-        while($after != null) {
+        while ($after != null) {
             $this->info("Fetching Post after: $after");
             $response = Http::get($url, [
                 'limit' => 100,
                 't' => 'all',
-                'after' => $after
+                'after' => $after,
             ]);
-
 
             $after = $response->json('data.after');
 
