@@ -53,4 +53,16 @@ return [
         'affiliate_url' => env('TICKETMASTER_AFFILIATE_URL'),
     ],
 
+    'eventim' => [],
+
+    'webdriver' => [
+        'url' => env('WEBDRIVER_URL'),
+    ],
+
+    'awin' => [
+        'publisher_id' => '2703006',
+        'api_key' => env('AWIN_API_KEY'),
+
+    ],
+
 ];

@@ -11,6 +11,7 @@
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "php-webdriver/webdriver": "^1.16",
         "sentry/sentry-laravel": "^4.20",
         "symfony/css-selector": "^7.3",
         "symfony/dom-crawler": "^7.3"

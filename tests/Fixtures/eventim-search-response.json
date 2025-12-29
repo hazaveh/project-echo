@@ -1,0 +1,344 @@
+{
+    "productGroups": [
+        {
+            "productGroupId": "3970645",
+            "name": "Godspeed You! Black Emperor",
+            "startDate": "2026-03-11T20:00:00+01:00",
+            "endDate": "2026-03-20T20:00:00+01:00",
+            "productCount": 7,
+            "link": "https://www.eventim.de/artist/godspeed-you-black-emperor/",
+            "url": {
+                "path": "/artist/godspeed-you-black-emperor/",
+                "domain": "https://www.eventim.de"
+            },
+            "imageUrl": "https://www.eventim.de/obj/mam/germany/db/b0/godspeed-you--black-emperor-tickets_444295_3592148_222x222.jpg",
+            "currency": "EUR",
+            "rating": {
+                "count": 11,
+                "average": 4.63640022277832
+            },
+            "categories": [
+                {
+                    "name": "Konzerte"
+                },
+                {
+                    "name": "Rock & Pop",
+                    "parentCategory": {
+                        "name": "Konzerte"
+                    }
+                }
+            ],
+            "tags": ["TICKETDIRECT", "MOBILE_TICKET"],
+            "status": "Available",
+            "rankingStatistic": {
+                "recommendationPriority": 0
+            },
+            "products": [
+                {
+                    "productId": "20645334",
+                    "name": "Godspeed You! Black Emperor / Support: Kristof Hahn",
+                    "type": "LiveEntertainment",
+                    "status": "Available",
+                    "link": "https://www.eventim.de/event/godspeed-you-black-emperor-kulturzentrum-schlachthof-e-v--20645334/",
+                    "url": {
+                        "path": "/event/godspeed-you-black-emperor-kulturzentrum-schlachthof-e-v--20645334/",
+                        "domain": "https://www.eventim.de"
+                    },
+                    "typeAttributes": {
+                        "liveEntertainment": {
+                            "startDate": "2026-03-15T20:00:00+01:00",
+                            "location": {
+                                "name": "Kulturzentrum Schlachthof e.V.",
+                                "city": "Wiesbaden",
+                                "postalCode": "65189",
+                                "geoLocation": {
+                                    "longitude": 8.24999998341103,
+                                    "latitude": 50.0832999848696
+                                }
+                            }
+                        }
+                    },
+                    "rating": {
+                        "count": 11,
+                        "average": 4.63640022277832
+                    },
+                    "tags": ["TICKETDIRECT"],
+                    "hasRecommendation": false
+                },
+                {
+                    "productId": "20639308",
+                    "name": "Godspeed You! Black Emperor",
+                    "type": "LiveEntertainment",
+                    "status": "Available",
+                    "link": "https://www.eventim.de/event/godspeed-you-black-emperor-festsaal-kreuzberg-20639308/",
+                    "url": {
+                        "path": "/event/godspeed-you-black-emperor-festsaal-kreuzberg-20639308/",
+                        "domain": "https://www.eventim.de"
+                    },
+                    "typeAttributes": {
+                        "liveEntertainment": {
+                            "startDate": "2026-03-16T20:00:00+01:00",
+                            "location": {
+                                "name": "Festsaal Kreuzberg",
+                                "city": "Berlin",
+                                "postalCode": "12435",
+                                "geoLocation": {
+                                    "longitude": 13.4000000133362,
+                                    "latitude": 52.5166999838365
+                                }
+                            }
+                        }
+                    },
+                    "rating": {
+                        "count": 11,
+                        "average": 4.63640022277832
+                    },
+                    "hasRecommendation": false
+                },
+                {
+                    "productId": "20631395",
+                    "name": "Godspeed You! Black Emperor",
+                    "type": "LiveEntertainment",
+                    "status": "Available",
+                    "link": "https://www.eventim.de/event/godspeed-you-black-emperor-markthalle-hamburg-20631395/",
+                    "url": {
+                        "path": "/event/godspeed-you-black-emperor-markthalle-hamburg-20631395/",
+                        "domain": "https://www.eventim.de"
+                    },
+                    "typeAttributes": {
+                        "liveEntertainment": {
+                            "startDate": "2026-03-17T20:00:00+01:00",
+                            "location": {
+                                "name": "Markthalle Hamburg",
+                                "city": "Hamburg",
+                                "postalCode": "20095",
+                                "geoLocation": {
+                                    "longitude": 9.99528001955283,
+                                    "latitude": 53.5453000018266
+                                }
+                            }
+                        }
+                    },
+                    "rating": {
+                        "count": 11,
+                        "average": 4.63640022277832
+                    },
+                    "tags": ["TICKETDIRECT", "MOBILE_TICKET"],
+                    "hasRecommendation": false
+                },
+                {
+                    "productId": "20619880",
+                    "name": "Godspeed You! Black Emperor",
+                    "type": "LiveEntertainment",
+                    "status": "Available",
+                    "link": "https://www.eventim.de/event/godspeed-you-black-emperor-reithalle-dresden-20619880/",
+                    "url": {
+                        "path": "/event/godspeed-you-black-emperor-reithalle-dresden-20619880/",
+                        "domain": "https://www.eventim.de"
+                    },
+                    "typeAttributes": {
+                        "liveEntertainment": {
+                            "startDate": "2026-03-18T20:00:00+01:00",
+                            "location": {
+                                "name": "Reithalle Dresden",
+                                "city": "Dresden",
+                                "postalCode": "01099",
+                                "geoLocation": {
+                                    "longitude": 13.7499999914503,
+                                    "latitude": 51.0499999918007
+                                }
+                            }
+                        }
+                    },
+                    "rating": {
+                        "count": 11,
+                        "average": 4.63640022277832
+                    },
+                    "tags": ["TICKETDIRECT"],
+                    "hasRecommendation": false
+                },
+                {
+                    "productId": "20621494",
+                    "name": "Godspeed You! Black Emperor",
+                    "type": "LiveEntertainment",
+                    "status": "Available",
+                    "link": "https://www.eventim.de/event/godspeed-you-black-emperor-technikum-20621494/",
+                    "url": {
+                        "path": "/event/godspeed-you-black-emperor-technikum-20621494/",
+                        "domain": "https://www.eventim.de"
+                    },
+                    "typeAttributes": {
+                        "liveEntertainment": {
+                            "startDate": "2026-03-19T20:00:00+01:00",
+                            "location": {
+                                "name": "Technikum",
+                                "city": "München",
+                                "postalCode": "81671",
+                                "geoLocation": {
+                                    "longitude": 11.6179630529851,
+                                    "latitude": 48.123576722043
+                                }
+                            }
+                        }
+                    },
+                    "rating": {
+                        "count": 11,
+                        "average": 4.63640022277832
+                    },
+                    "tags": ["TICKETDIRECT", "MOBILE_TICKET"],
+                    "hasRecommendation": false
+                }
+            ]
+        }
+    ],
+    "facets": [
+        {
+            "name": "cities",
+            "facetItems": [
+                {
+                    "value": "Berlin",
+                    "count": 1,
+                    "info": "berlin-1"
+                },
+                {
+                    "value": "Dresden",
+                    "count": 1,
+                    "info": "dresden-3"
+                },
+                {
+                    "value": "Hamburg",
+                    "count": 1,
+                    "info": "hamburg-7"
+                },
+                {
+                    "value": "Köln",
+                    "count": 1,
+                    "info": "koeln-9"
+                },
+                {
+                    "value": "Linz",
+                    "count": 1,
+                    "info": "linz-36d"
+                },
+                {
+                    "value": "München",
+                    "count": 1,
+                    "info": "muenchen-11"
+                },
+                {
+                    "value": "Wiesbaden",
+                    "count": 1,
+                    "info": "wiesbaden-88"
+                }
+            ]
+        },
+        {
+            "name": "venues",
+            "facetItems": [
+                {
+                    "value": "Festsaal Kreuzberg",
+                    "count": 1
+                },
+                {
+                    "value": "Kulturzentrum Schlachthof e.V.",
+                    "count": 1
+                },
+                {
+                    "value": "Markthalle Hamburg",
+                    "count": 1
+                },
+                {
+                    "value": "Posthof Linz",
+                    "count": 1
+                },
+                {
+                    "value": "Reithalle Dresden",
+                    "count": 1
+                },
+                {
+                    "value": "Technikum",
+                    "count": 1
+                },
+                {
+                    "value": "Yard Club / Die Kantine",
+                    "count": 1
+                }
+            ]
+        },
+        {
+            "name": "categories",
+            "facetHierarchicalItems": [
+                {
+                    "value": "Konzerte",
+                    "count": 7,
+                    "hierarchicalItems": [
+                        {
+                            "value": "Rock & Pop",
+                            "count": 7
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "recommendations",
+            "facetItems": [
+                {
+                    "value": "false",
+                    "count": 7
+                }
+            ]
+        },
+        {
+            "name": "topCities",
+            "facetHierarchicalItems": [
+                {
+                    "value": "otherCities",
+                    "count": 7,
+                    "facetItems": [
+                        {
+                            "value": "Berlin",
+                            "count": 1,
+                            "info": "berlin-1"
+                        },
+                        {
+                            "value": "Dresden",
+                            "count": 1,
+                            "info": "dresden-3"
+                        },
+                        {
+                            "value": "Hamburg",
+                            "count": 1,
+                            "info": "hamburg-7"
+                        },
+                        {
+                            "value": "Köln",
+                            "count": 1,
+                            "info": "koeln-9"
+                        },
+                        {
+                            "value": "Linz",
+                            "count": 1,
+                            "info": "linz-36d"
+                        },
+                        {
+                            "value": "München",
+                            "count": 1,
+                            "info": "muenchen-11"
+                        },
+                        {
+                            "value": "Wiesbaden",
+                            "count": 1,
+                            "info": "wiesbaden-88"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "searchTerm": "Godspeed You! Black Emperor",
+    "results": 1,
+    "totalResults": 1,
+    "page": 1,
+    "totalPages": 1
+}
