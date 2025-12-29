@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Artists\RelationManagers;
 
 use App\Enum\TicketProvidersEnum;
+use App\Models\TicketProviderMapping;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -19,6 +20,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Arr;
 
 class TicketProvidersRelationManager extends RelationManager
 {
@@ -29,7 +31,19 @@ class TicketProvidersRelationManager extends RelationManager
         return $schema
             ->components([
                 Select::make('provider')
-                    ->options(TicketProvidersEnum::filamentSelectOptions())
+                    ->options(function (?TicketProviderMapping $record): array {
+                        $options = TicketProvidersEnum::filamentSelectOptions();
+                        $existingProviders = $this->getOwnerRecord()
+                            ->ticketProviderMappings()
+                            ->pluck('provider')
+                            ->all();
+
+                        if ($record?->provider) {
+                            $existingProviders = array_diff($existingProviders, [$record->provider]);
+                        }
+
+                        return Arr::except($options, $existingProviders);
+                    })
                     ->required(),
                 TextInput::make('provider_artist_id')->required(),
                 Select::make('status')

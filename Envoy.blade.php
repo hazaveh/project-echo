@@ -8,4 +8,5 @@
     docker exec echo-api composer install
     docker exec echo-api php artisan migrate --force
     docker exec echo-api php artisan optimize
+    docker run --rm -v /srv/stacks/project-echo:/app -w /app node:20 bash -c "npm install && npm run build"
 @endtask
