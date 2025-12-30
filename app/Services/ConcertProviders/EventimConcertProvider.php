@@ -177,8 +177,18 @@ class EventimConcertProvider implements ConcertProviderInterface
     ): ProviderResult {
         try {
             $driver->manage()->timeouts()->pageLoadTimeout(self::REQUEST_TIMEOUT_SECONDS);
-            $driver->get(self::BASE_URL);
-            $this->waitForCookieSeed($driver);
+            try {
+                $driver->get(self::BASE_URL);
+                $this->waitForCookieSeed($driver);
+            } catch (Throwable $exception) {
+                report($exception);
+                Log::warning('Eventim WebDriver base page load failed.', [
+                    'prn_artist_id' => $artist->prn_artist_id,
+                    'artist_id' => $artist->id,
+                    'provider_artist_id' => $mapping->provider_artist_id,
+                    'message' => $exception->getMessage(),
+                ]);
+            }
 
             $url = self::SEARCH_URL.'?'.http_build_query($this->eventimQueryParams($searchTerm));
             $driver->get($url);
