@@ -55,6 +55,10 @@ return [
 
     'eventim' => [],
 
+    'google' => [
+        'geocoding_key' => env('GOOGLE_GEOCODING_KEY'),
+    ],
+
     'webdriver' => [
         'url' => env('WEBDRIVER_URL'),
     ],

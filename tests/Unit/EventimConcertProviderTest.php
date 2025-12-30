@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Affiliates\GenerateAwinLinkAction;
+use App\Actions\Geo\GeocodeVenueAction;
 use App\Services\ConcertProviders\EventimConcertProvider;
 use Tests\TestCase;
 
@@ -15,7 +16,15 @@ it('returns performances for a matching eventim artist path', function () {
         }
     };
 
-    $provider = new EventimConcertProvider($awinAction);
+    $geocodeAction = new class extends GeocodeVenueAction
+    {
+        public function execute(string $venueName, ?string $postalCode, ?string $city, ?string $country): ?array
+        {
+            return null;
+        }
+    };
+
+    $provider = new EventimConcertProvider($awinAction, $geocodeAction);
     $providerArtistId = '/artist/godspeed-you-black-emperor/';
 
     $method = new ReflectionMethod($provider, 'performancesFromEventimPayload');
@@ -38,7 +47,15 @@ it('returns an empty performance list when the artist path does not match', func
         }
     };
 
-    $provider = new EventimConcertProvider($awinAction);
+    $geocodeAction = new class extends GeocodeVenueAction
+    {
+        public function execute(string $venueName, ?string $postalCode, ?string $city, ?string $country): ?array
+        {
+            return null;
+        }
+    };
+
+    $provider = new EventimConcertProvider($awinAction, $geocodeAction);
     $providerArtistId = '/artist/other-artist/';
 
     $method = new ReflectionMethod($provider, 'performancesFromEventimPayload');

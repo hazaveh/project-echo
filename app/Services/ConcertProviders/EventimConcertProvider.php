@@ -3,6 +3,7 @@
 namespace App\Services\ConcertProviders;
 
 use App\Actions\Affiliates\GenerateAwinLinkAction;
+use App\Actions\Geo\GeocodeVenueAction;
 use App\DTO\ConcertProviders\ProviderResult;
 use App\Models\Artist;
 use App\Models\TicketProviderMapping;
@@ -20,7 +21,7 @@ class EventimConcertProvider implements ConcertProviderInterface
 
     private const REQUEST_TIMEOUT_SECONDS = 10;
 
-    private const CONNECT_TIMEOUT_SECONDS = 5;
+    private const CONNECT_TIMEOUT_SECONDS = 10;
 
     private const WEB_ID = 'web__eventim-de';
 
@@ -39,7 +40,8 @@ class EventimConcertProvider implements ConcertProviderInterface
     private const ADVERTISER_ID = '11388';
 
     public function __construct(
-        private GenerateAwinLinkAction $generateAwinLinkAction
+        private GenerateAwinLinkAction $generateAwinLinkAction,
+        private GeocodeVenueAction $geocodeVenueAction
     ) {}
 
     public function providerKey(): string
@@ -481,6 +483,14 @@ class EventimConcertProvider implements ConcertProviderInterface
         $status = $this->normalizeStatus($this->stringOrNull(data_get($product, 'status')));
         $eventimUrl = $this->productUrl($product);
         $country = $this->countryFromDomain($eventimUrl);
+        $venueName = $this->stringOrNull(data_get($location, 'name'));
+        $postalCode = $this->stringOrNull(data_get($location, 'postalCode'));
+        $city = $this->stringOrNull(data_get($location, 'city'));
+        $geocoded = $this->geocodeVenueAction->execute($venueName ?? '', $postalCode, $city, $country['name']);
+        $geocoded = is_array($geocoded) ? $geocoded : [];
+        $geocodedAddress = $geocoded['address'] ?? null;
+        $geocodedCountry = $geocoded['country'] ?? null;
+        $geocodedCountryCode = $geocoded['country_code'] ?? null;
 
         return [
             'identifier' => null,
@@ -489,12 +499,12 @@ class EventimConcertProvider implements ConcertProviderInterface
             'start_date' => $this->dateOrNull(data_get($liveEntertainment, 'startDate')),
             'end_date' => null,
             'status' => $status,
-            'address_name' => $this->stringOrNull(data_get($location, 'name')),
-            'address' => null,
-            'city' => $this->stringOrNull(data_get($location, 'city')),
-            'country' => $country['name'],
-            'country_code' => $country['code'],
-            'postal_code' => $this->stringOrNull(data_get($location, 'postalCode')),
+            'address_name' => $venueName,
+            'address' => $geocodedAddress,
+            'city' => $city,
+            'country' => $geocodedCountry ?? $country['name'],
+            'country_code' => $geocodedCountryCode ?? $country['code'],
+            'postal_code' => $postalCode,
             'latitude' => $this->coordinateOrNull(data_get($location, 'geoLocation.latitude')),
             'longitude' => $this->coordinateOrNull(data_get($location, 'geoLocation.longitude')),
             'offers' => [

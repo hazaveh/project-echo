@@ -9,7 +9,7 @@ class BandcampController extends Controller
 {
     public function searchAlbums(string $search, SearchAlbumAction $action): array
     {
-        return Cache::remember('bandcamp-albums-'.md5($search), 60, function () use ($search, $action) {
+        return Cache::remember('bandcamp-albums-'.md5($search), 120, function () use ($search, $action) {
             return $action->execute($search);
         });
     }
