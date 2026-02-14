@@ -14,6 +14,9 @@ Route::group(['middleware' => AuthorizeTokenMiddleware::class], function () {
 
     /** Bandcamp */
     Route::get('bandcamp/albums/{search}', [BandcampController::class, 'searchAlbums']);
+    Route::get('bandcamp/artists/{username}/albums', [BandcampController::class, 'artistAlbums']);
+    Route::get('bandcamp/artists/{username}/albums/{releaseType}/{albumSlug}', [BandcampController::class, 'albumDetailsByType']);
+    Route::get('bandcamp/artists/{username}/albums/{albumSlug}', [BandcampController::class, 'albumDetails']);
 
     Route::post('captureEmail', CaptureEmailAddressController::class);
 
