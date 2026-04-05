@@ -25,6 +25,6 @@ class CaptureEmailAddressController extends Controller
 
     private function getDomain(string $url): string
     {
-        return parse_url($url, PHP_URL_HOST);
+        return parse_url($url, PHP_URL_HOST) ?? $url;
     }
 }
